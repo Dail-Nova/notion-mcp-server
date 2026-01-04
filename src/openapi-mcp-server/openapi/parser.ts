@@ -424,19 +424,28 @@ export class OpenAPIToMCPConverter {
         }
         // Handle application/json
         else if (bodyObj.content['application/json']?.schema) {
-          const bodySchema = this.convertOpenApiSchemaToJsonSchema(bodyObj.content['application/json'].schema, new Set(), false)
-          // Merge body schema into the inputSchema's properties
-          if (bodySchema.type === 'object' && bodySchema.properties) {
-            for (const [name, propSchema] of Object.entries(bodySchema.properties)) {
-              inputSchema.properties![name] = propSchema
-            }
-            if (bodySchema.required) {
-              inputSchema.required!.push(...bodySchema.required!)
-            }
-          } else {
-            // If the request body is not an object, just put it under "body"
+          const originalSchema = bodyObj.content['application/json'].schema
+          // If the original schema is a $ref, preserve it as a 'body' parameter
+          if ('$ref' in originalSchema) {
+            const bodySchema = this.convertOpenApiSchemaToJsonSchema(originalSchema, new Set(), false)
             inputSchema.properties!['body'] = bodySchema
             inputSchema.required!.push('body')
+          } else {
+            // For inline schemas, resolve refs and merge properties
+            const bodySchema = this.convertOpenApiSchemaToJsonSchema(originalSchema, new Set(), true)
+            // Merge body schema into the inputSchema's properties
+            if (bodySchema.type === 'object' && bodySchema.properties) {
+              for (const [name, propSchema] of Object.entries(bodySchema.properties)) {
+                inputSchema.properties![name] = propSchema
+              }
+              if (bodySchema.required) {
+                inputSchema.required!.push(...bodySchema.required!)
+              }
+            } else {
+              // If the request body is not an object, just put it under "body"
+              inputSchema.properties!['body'] = bodySchema
+              inputSchema.required!.push('body')
+            }
           }
         }
       }
