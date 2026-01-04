@@ -105,6 +105,17 @@ export class OpenAPIToMCPConverter {
       result.format = 'uri-reference'
       const binaryDesc = 'absolute paths to local files'
       result.description = schema.description ? `${schema.description} (${binaryDesc})` : binaryDesc
+    } else if (schema.format === 'json' && schema.type === 'string') {
+      // Handle format: json - convert string to object to avoid double serialization
+      // When OpenAPI specifies format: json with type: string, the intent is to pass
+      // a JSON object that will be serialized by the HTTP client. If we keep it as string,
+      // the caller passes an object, JSON.stringify is called, and the result is a
+      // double-escaped JSON string.
+      result.type = 'object'
+      result.additionalProperties = true
+      if (schema.description) {
+        result.description = schema.description
+      }
     } else {
       if (schema.format) {
         result.format = schema.format
