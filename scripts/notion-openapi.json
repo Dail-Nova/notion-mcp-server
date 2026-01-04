@@ -1893,10 +1893,137 @@
         "security": []
       }
     },
+    "/v1/databases": {
+      "post": {
+        "summary": "Create a database",
+        "description": "Create a new database. This is the recommended method for API version 2025-09-03 and later. Use initial_data_source to define the database schema.",
+        "operationId": "create-database",
+        "tags": ["Databases"],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/notionVersion"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["parent"],
+                "properties": {
+                  "parent": {
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/pageIdParentRequest"
+                      },
+                      {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "properties": {
+                          "type": {
+                            "type": "string"
+                          },
+                          "page_id": {
+                            "type": "string",
+                            "format": "uuid"
+                          }
+                        },
+                        "required": ["type", "page_id"]
+                      }
+                    ],
+                    "description": "The parent page for the new database"
+                  },
+                  "initial_data_source": {
+                    "type": "object",
+                    "description": "The initial data source configuration for the database",
+                    "properties": {
+                      "properties": {
+                        "type": "object",
+                        "additionalProperties": true,
+                        "description": "Property schema of the database. Keys are property names, values are property configurations with 'type' field (e.g., title, rich_text, number, select, multi_select, date, people, files, checkbox, url, email, phone_number, formula, relation, rollup, created_time, created_by, last_edited_time, last_edited_by, status)"
+                      }
+                    }
+                  },
+                  "title": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/richTextRequest"
+                    },
+                    "description": "Title of the database as an array of rich text objects"
+                  },
+                  "description": {
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/richTextRequest"
+                    },
+                    "description": "Description of the database as an array of rich text objects"
+                  },
+                  "icon": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Icon for the database (emoji or external file object)"
+                  },
+                  "cover": {
+                    "type": "object",
+                    "additionalProperties": true,
+                    "description": "Cover image for the database (external file object)"
+                  },
+                  "is_inline": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Whether the database appears inline in the parent page"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response - returns the created database object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "object": {
+                      "type": "string",
+                      "example": "error"
+                    },
+                    "status": {
+                      "type": "integer",
+                      "example": 400
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "deprecated": false,
+        "security": []
+      }
+    },
     "/v1/data_sources": {
       "post": {
         "summary": "Create a data source",
-        "description": "Create a new data source (database)",
+        "description": "Create a new data source (database). Note: For API version 2025-09-03 and later, use the Create Database API (/v1/databases) instead for creating new databases.",
         "operationId": "create-a-data-source",
         "tags": ["Data sources"],
         "parameters": [
