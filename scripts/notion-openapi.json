@@ -1916,6 +1916,7 @@
                   },
                   "properties": {
                     "type": "object",
+                    "additionalProperties": true,
                     "description": "Property schema of data source"
                   },
                   "title": {
