@@ -853,19 +853,15 @@
             "application/json": {
               "schema": {
                 "type": "object",
+                "additionalProperties": true,
                 "properties": {
-                  "type": {
-                    "type": "object",
-                    "description": "The [block object `type`](ref:block#block-object-keys) value with the properties to be updated. Currently only `text` (for supported block types) and `checked` (for `to_do` blocks) fields can be updated.",
-                    "properties": {},
-                    "additionalProperties": true
-                  },
                   "archived": {
                     "type": "boolean",
                     "description": "Set to true to archive (delete) a block. Set to false to un-archive (restore) a block.",
                     "default": true
                   }
-                }
+                },
+                "description": "Block update object. Include the block type key (e.g., 'paragraph', 'heading_1', 'to_do') at the top level with its content."
               }
             }
           }
